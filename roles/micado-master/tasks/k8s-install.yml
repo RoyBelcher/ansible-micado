@@ -25,17 +25,15 @@
     state: present
     update_cache: yes
   with_items:
-    - kubernetes-cni=0.6.0-00
-    - kubelet=1.13.1*
-    - kubeadm=1.13.1*
-    - kubectl=1.13.1*
+    - kubelet=1.13.5*
+    - kubeadm=1.13.5*
+    - kubectl=1.13.5*
 
 - name: 'K8s: prevent package from being upgraded'
   dpkg_selections:
     name: "{{ item }}"
     selection: hold
   with_items:
-    - kubernetes-cni
     - kubelet
     - kubeadm
     - kubectl
