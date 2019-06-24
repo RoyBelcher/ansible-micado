@@ -1,0 +1,47 @@
+---
+- name: Add the overlay module
+  modprobe:
+    name: overlay
+    state: present
+
+- name: Add the br_netfilter module
+  modprobe:
+    name: br_netfilter
+    state: present
+
+- name: Apply iptables rules to bridged packets 
+  shell: bash -c 'echo -e  "net.bridge.bridge-nf-call-iptables  = 1\nnet.ipv4.ip_forward                 = 1\nnet.bridge.bridge-nf-call-ip6tables = 1" > /etc/sysctl.d/99-kubernetes-cri.conf'
+
+- name: Reload system config from file to take the new modules
+  shell: sysctl --system
+
+- name: 'CRI-O: Installing dependencies'
+  apt:
+    pkg: "{{ item }}"
+    state: present
+  with_items:
+    - software-properties-common
+
+- name: 'CRI-O: Adding APT repository'
+  - apt_repository:
+    repo: ppa:projectatomic/ppa
+    state: present
+
+- name: 'CRI-O: Install' 
+  apt:
+    name: cri-o-1.11
+    update_cache: yes
+
+- name: 'CRI-O: Add docker.io as a repository for images'
+  shell: sed -i 's/\#registries = \[/registries = \[\n\"docker.io\"\n\]/g' /etc/crio/crio.conf
+
+- name: 'CRI-O: Restart service'
+  systemd:
+    daemon_reload: yes
+    name: crio
+    state: restarted
+    enabled: yes
+    masked: no
+
+
+

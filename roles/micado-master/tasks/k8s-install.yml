@@ -115,3 +115,7 @@
     path: /etc/kubernetes/manifests/kube-apiserver.yaml
     regexp: '^    - --insecure-port=\d*'
     line: '    - --insecure-port=8001'
+
+- name: 'K8s: Configure the host to run CRI-O'
+  shell: bash -c 'echo -e "[Service]\nEnvironment=\"KUBELET_EXTRA_ARGS=--container-runtime=remote --container-runtime-endpoint=/var/run/crio/crio.sock --cgroup-driver=systemd\"" > /etc/systemd/system/kubelet.service.d/20-cri.conf'
+

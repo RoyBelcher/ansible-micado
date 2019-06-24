@@ -3,6 +3,8 @@
 
 - include: docker-install.yml
 
+- include: crio-install.yml
+
 - include: k8s-install.yml
 
 - include: files.yml
@@ -17,3 +19,7 @@
 
 - include: docker-login.yml
   when: docker_cred_path is defined
+
+- name: Reboot the machine to apply all updates
+  reboot:
+    reboot_timeout: 3600
